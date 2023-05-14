@@ -75,6 +75,8 @@ builder.Services.AddAuthentication(opt =>
 #endregion
 
 builder.Services.AddScoped<IFoodRepo, FoodRepo>();
+builder.Services.AddScoped<IBookTableRepo, BookTableRepo>();
+builder.Services.AddScoped<IBillingRepo, BillingRepo>();
 
 builder.Services.AddCors(opt =>
 {
