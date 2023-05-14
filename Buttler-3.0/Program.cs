@@ -1,3 +1,5 @@
+using Buttler.Application.Repositories;
+using Buttler.Domain.Data;
 using Buttler.Infrastructure.Identity;
 using Buttler.Infrastructure.Persistence;
 using Buttler_3._0.Services;
@@ -11,6 +13,8 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddMediatR(conf => conf.RegisterServicesFromAssembly(AppDomain.CurrentDomain.Load("Buttler.Application")));
+
 #region Configure ApplicationDbContext services and scopes
 builder.Services.AddScoped<ApplicationDbContext>();
 builder.Services.AddScoped<AppDbInitializer>();
@@ -25,7 +29,6 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(opt => opt.TokenL
 #endregion
 
 #region Database context services
-//builder.Services.AddDbContext<ButtlerContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 #endregion
 
 #region Identity Options
@@ -38,7 +41,6 @@ builder.Services.Configure<IdentityOptions>(opt =>
     opt.Password.RequireNonAlphanumeric = true;
     opt.Password.RequireDigit = true;
 
-    opt.User.AllowedUserNameCharacters = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM+.-_@";
     opt.User.RequireUniqueEmail = true;
 
     opt.Tokens.AuthenticatorTokenProvider = "Ayush";
@@ -69,6 +71,10 @@ builder.Services.AddAuthentication(opt =>
     };
 });
 #endregion
+
+builder.Services.AddScoped<IFoodRepo, FoodRepo>();
+builder.Services.AddScoped<IBookTableRepo, BookTableRepo>();
+builder.Services.AddScoped<IBillingRepo, BillingRepo>();
 
 builder.Services.AddCors(opt =>
 {

@@ -217,5 +217,48 @@ namespace Buttler_3._0.Controllers
             }
             return BadRequest(new ResultDto<bool>(false, "Something went wrong."));
         }
+
+        /// <summary>
+        /// Send email confirmation mail.
+        /// </summary>
+        /// <param name="email">User email.</param>
+        /// <returns></returns>
+        [HttpPost("SendEmailConfirmationMail")]
+        public async Task<IActionResult> SendEmailConfirmationMail(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) { return NotFound(new ResultDto<bool>(false, "User not found.")); }
+            if (user != null)
+            {
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var encode = HttpUtility.UrlEncode(code);
+                var callbackURL = $"http://localhost:4200/verification?email={user.Email}&code={encode}";
+                return Ok(new ResultDto<string>(false, callbackURL));
+            }
+            return BadRequest(new ResultDto<bool>(false, "Something went wrong."));
+        }
+
+        /// <summary>
+        /// Email Confirmation
+        /// </summary>
+        /// <param name="email">Takes user's email</param>
+        /// <param name="code">Verification code</param>
+        /// <returns></returns>
+        [HttpPost("ConfirmEmail")]
+        public async Task<IActionResult> ConfirmEmail(string email, string code)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) { return NotFound(new ResultDto<bool>(false, "User not found.")); }
+            if (user != null)
+            {
+                var result = await _userManager.ConfirmEmailAsync(user, code);
+                if (result.Succeeded)
+                {
+                    return Ok(new ResultDto<bool>(true, "Email is confirmed."));
+                }
+                return BadRequest(new ResultDto<bool>(false, "Invalid token or token is expired."));
+            }
+            return BadRequest(new ResultDto<bool>(false, "Somthing went wrong."));
+        }
     }
 }

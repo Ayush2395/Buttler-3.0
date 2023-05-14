@@ -28,7 +28,6 @@ namespace Buttler_3._0.Services
                 _jwt.Issuer,
                 _jwt.Audience,
                 claims,
-                expires: DateTime.UtcNow.AddMinutes(43200),
                 signingCredentials: key
                 );
             return token;
