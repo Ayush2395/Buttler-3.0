@@ -15,7 +15,7 @@ namespace Buttler.Application.Repositories
 
         public int BookTableForCustomer(TablesDto table)
         {
-            if (table != null)
+            if (table != null && _context.Customers.Any(r => r.CustomerId == table.CustomerId))
             {
                 _context.Tables.Add(new()
                 {
@@ -39,9 +39,10 @@ namespace Buttler.Application.Repositories
                     PhoneNumber = customer.PhoneNumber,
                 });
                 _context.SaveChanges();
+                var customers = _context.Customers.OrderBy(r => r.CustomerId).LastOrDefault()!.CustomerId;
+                return customers;
             }
-            var customers = _context.Customers.OrderBy(r => r.CustomerId).LastOrDefault()!.CustomerId;
-            return customers;
+            return 0;
         }
     }
 

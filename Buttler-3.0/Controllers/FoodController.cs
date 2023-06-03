@@ -44,7 +44,7 @@ namespace Buttler_3._0.Controllers
         public async Task<IActionResult> BookTableForCustomer(TablesDto table)
         {
             var result = await Mediator.Send(new CustomerTableCommand { Table = table });
-            return result != null ? Ok(result) : BadRequest(new ResultDto<bool>(false, "Fill the table number."));
+            return result != 0 ? Ok(new { tableNumber = result }) : NotFound("Customer id is not found.");
         }
     }
 }
