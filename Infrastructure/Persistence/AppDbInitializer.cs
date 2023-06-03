@@ -67,7 +67,7 @@ namespace Buttler.Infrastructure.Persistence
             }
 
             // Default users
-            var administrator = new AppUser { UserName = "Ayush", Email = "ayushkrishanmandal@gmail.com" };
+            var administrator = new AppUser { UserName = "ayushkrishanmandal@gmail.com", Email = "ayushkrishanmandal@gmail.com", FirstName = "Ayush", LastName = "Kumar", Age = 23, Gender = "male", CreatedAt = DateTime.UtcNow };
 
             if (_userManager.Users.All(u => u.UserName != administrator.UserName))
             {

@@ -260,5 +260,15 @@ namespace Buttler_3._0.Controllers
             }
             return BadRequest(new ResultDto<bool>(false, "Somthing went wrong."));
         }
+
+        [Authorize(Roles = "admin,staff")]
+        [HttpGet("UserDetails")]
+        public async Task<IActionResult> GetUserDetails(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            var role = await _userManager.GetRolesAsync(user);
+            if (role == null) { return NotFound("User not found."); }
+            return Ok(new ResultDto<object>(true, new { user.UserName, user.FirstName, user.LastName, user.PhoneNumber, user.Email, user.EmailConfirmed, user.Age, user.Gender, user.ProfilePic, user.CreatedAt }, null!));
+        }
     }
 }

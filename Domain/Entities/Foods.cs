@@ -9,6 +9,8 @@ namespace Buttler.Domain.Entities
 
         [StringLength(85)]
         public string? Title { get; set; }
+
+        [StringLength(256)]
         public string? Description { get; set; }
         public string? FoodImg { get; set; }
     }
