@@ -32,7 +32,7 @@ namespace Buttler_3._0.Controllers
         public async Task<IActionResult> AddCustomerDetails(CustomerDto customer)
         {
             var result = await Mediator.Send(new CustomerDetailCommand { Customer = customer });
-            return Ok(new { customerId = result });
+            return Ok(new ResultDto<CustomerDto>(true, result, "User added successfull"));
         }
 
         /// <summary>

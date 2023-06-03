@@ -88,5 +88,36 @@ namespace Buttler_3._0.Controllers
         {
             return Ok(await Mediator.Send(new UpdateOrderStatusCommand { OrderMasterId = OrderMasterId, OrderStatus = OrderStatus }));
         }
+
+        [HttpDelete("DeleteStaffData/{email}")]
+        public async Task<IActionResult> DeleteStaffById([FromRoute] string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user != null)
+            {
+                await _userManager.DeleteAsync(user);
+                return Ok(new ResultDto<bool>(true, true, "Staff successfully removed."));
+            }
+            return BadRequest(new ResultDto<bool>(false, false, "Something went wrong."));
+        }
+
+        [HttpGet("GetAllStaffs")]
+        public async Task<IActionResult> GetAllStaff()
+        {
+            var getStaffRole = await _roleManager.FindByNameAsync("staff");
+            var staffUsers = _userManager
+                            .GetUsersInRoleAsync(getStaffRole.Name).Result
+                            .Select(r => new UserDetailsDto
+                            {
+                                Age = r.Age,
+                                Email = r.Email,
+                                FirstName = r.FirstName,
+                                LastName = r.LastName,
+                                Gender = r.Gender,
+                                JoiningDate = r.CreatedAt,
+                                UserName = r.UserName,
+                            });
+            return Ok(new { staffUsers });
+        }
     }
 }
