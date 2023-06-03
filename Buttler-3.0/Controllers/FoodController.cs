@@ -1,7 +1,6 @@
 ﻿using Buttler.Application.Common.Commanda.Customer;
 using Buttler.Application.Common.Query.Food;
 using Buttler.Application.DTO;
-using Buttler.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,7 +32,7 @@ namespace Buttler_3._0.Controllers
         public async Task<IActionResult> AddCustomerDetails(CustomerDto customer)
         {
             var result = await Mediator.Send(new CustomerDetailCommand { Customer = customer });
-            return result != null ? Ok(new ResultDto<Customers>(true, result, "Customer details added.")) : BadRequest(new ResultDto<bool>(false, "Please fill required fields."));
+            return Ok(new { customerId = result });
         }
 
         /// <summary>

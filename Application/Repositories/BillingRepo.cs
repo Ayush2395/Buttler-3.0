@@ -21,6 +21,7 @@ namespace Buttler.Application.Repositories
                           {
                               CustomerName = customer.CustomerName,
                               CustomerPhoneNumber = customer.PhoneNumber,
+                              OrderStatus = ordMst.OrderStatus,
                               Bill = ordMst.TotalBill,
                               DateOfOrder = ordMst.DateOfOrder,
                           }).ToList();

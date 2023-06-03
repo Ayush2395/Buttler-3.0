@@ -4,10 +4,10 @@ using MediatR;
 
 namespace Buttler.Application.Common.Commanda.Customer
 {
-    public class CustomerTableCommand : IRequest<ResultDto<bool>>
+    public class CustomerTableCommand : IRequest<ResultDto<object>>
     {
         public TablesDto Table { get; set; }
-        public class Handler : IRequestHandler<CustomerTableCommand, ResultDto<bool>>
+        public class Handler : IRequestHandler<CustomerTableCommand, ResultDto<object>>
         {
             private readonly IBookTableRepo _bookTableRepo;
 
@@ -16,10 +16,10 @@ namespace Buttler.Application.Common.Commanda.Customer
                 _bookTableRepo = bookTableRepo;
             }
 
-            public Task<ResultDto<bool>> Handle(CustomerTableCommand request, CancellationToken cancellationToken)
+            public Task<ResultDto<object>> Handle(CustomerTableCommand request, CancellationToken cancellationToken)
             {
-                _bookTableRepo.BookTableForCustomer(request.Table);
-                return Task.FromResult(new ResultDto<bool>(true, "Table booked."));
+                var tablenumber = _bookTableRepo.BookTableForCustomer(request.Table);
+                return Task.FromResult(new ResultDto<object>(true, new { tableNumber = tablenumber }, "Table booked."));
             }
         }
     }

@@ -13,7 +13,7 @@ namespace Buttler.Application.Repositories
             _context = context;
         }
 
-        public void BookTableForCustomer(TablesDto table)
+        public int BookTableForCustomer(TablesDto table)
         {
             if (table != null)
             {
@@ -23,10 +23,12 @@ namespace Buttler.Application.Repositories
                     CustomerId = table.CustomerId,
                 });
                 _context.SaveChanges();
+                return _context.Tables.OrderBy(r => r.TablesId).LastOrDefault()!.TableNumber;
             }
+            return 0;
         }
 
-        public Customers TakeCustomerDetails(CustomerDto customer)
+        public int TakeCustomerDetails(CustomerDto customer)
         {
             if (customer != null)
             {
@@ -38,14 +40,14 @@ namespace Buttler.Application.Repositories
                 });
                 _context.SaveChanges();
             }
-            var customers = _context.Customers.OrderBy(rec => rec.CustomerId).LastOrDefault();
-            return customers != null ? customers : null!;
+            var customers = _context.Customers.OrderBy(r => r.CustomerId).LastOrDefault()!.CustomerId;
+            return customers;
         }
     }
 
     public interface IBookTableRepo
     {
-        Customers TakeCustomerDetails(CustomerDto customer);
-        void BookTableForCustomer(TablesDto table);
+        int TakeCustomerDetails(CustomerDto customer);
+        int BookTableForCustomer(TablesDto table);
     }
 }

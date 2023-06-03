@@ -55,60 +55,6 @@ namespace Buttler_3._0.Controllers
         }
 
         /// <summary>
-        /// Register new user with credentials
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns>Give user credentials as the model given below.</returns>
-        [HttpPost("RegisterStaff")]
-        public async Task<IActionResult> RegisterNewUser([FromBody] RegisterDto model)
-        {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            var passwordValidator = _userManager.PasswordValidators;
-            List<string> errors = new();
-            foreach (var password in passwordValidator)
-            {
-                var result = await password.ValidateAsync(_userManager, null!, model.Password);
-                if (!result.Succeeded)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        errors.Add(error.Description);
-                    }
-                    return BadRequest(new ResultDto<List<string>>(false, errors));
-                }
-            }
-            if (user != null)
-            {
-                return BadRequest(new ResultDto<bool>(false, "User already exist."));
-            }
-            if (user == null)
-            {
-                var staffRole = await _roleManager.FindByNameAsync("staff");
-                var userDetails = new AppUser
-                {
-                    UserName = model.FirstName,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email,
-                    CreatedAt = DateTime.UtcNow,
-                    Gender = model.Gender,
-                    PhoneNumber = model.PhoneNumber,
-                };
-
-                var newUser = await _userManager.CreateAsync(userDetails, model.Password);
-                if (newUser.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(userDetails, staffRole.Name);
-                    return Ok(new ResultDto<bool>(true, "Your account is registered."));
-                }
-
-                return BadRequest(new ResultDto<IEnumerable<IdentityError>>(false, newUser.Errors));
-
-            }
-            return BadRequest();
-        }
-
-        /// <summary>
         /// Send the email verification code, but now returning only url string
         /// </summary>
         /// <param name="email">Enter user's email.</param>

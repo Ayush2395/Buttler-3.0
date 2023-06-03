@@ -9,4 +9,9 @@
         public decimal? Price { get; set; }
         public int Quantity { get; set; }
     }
+
+    public class FoodId
+    {
+        public int FoodItemId { get; set; }
+    }
 }
