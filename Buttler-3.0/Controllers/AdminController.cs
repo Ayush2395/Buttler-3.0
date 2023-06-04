@@ -117,7 +117,7 @@ namespace Buttler_3._0.Controllers
                                 JoiningDate = r.CreatedAt,
                                 UserName = r.UserName,
                             });
-            return Ok(new { staffUsers });
+            return Ok(new ResultDto<IEnumerable<UserDetailsDto>>(true,staffUsers));
         }
     }
 }

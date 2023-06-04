@@ -28,7 +28,7 @@ namespace Buttler.Application.Repositories
             return 0;
         }
 
-        public CustomerDto TakeCustomerDetails(CustomerDto customer)
+        public int TakeCustomerDetails(CustomerDto customer)
         {
             if (customer != null)
             {
@@ -39,22 +39,17 @@ namespace Buttler.Application.Repositories
                     PhoneNumber = customer.PhoneNumber,
                 });
                 _context.SaveChanges();
-                var customers = _context.Customers.Select(r => new CustomerDto
-                {
-                    CustomerId = r.CustomerId,
-                    CustomerGender = r.Gender,
-                    PhoneNumber = r.PhoneNumber,
-                    CustomerName = customer.CustomerName,
-                }).OrderBy(r => r.CustomerId).LastOrDefault();
-                return customers ?? null!;
+                var id = _context.Customers.OrderBy(r => r.CustomerId).LastOrDefault()!.CustomerId;
+
+                return id;
             }
-            return null!;
+            return 0;
         }
     }
 
     public interface IBookTableRepo
     {
-        CustomerDto TakeCustomerDetails(CustomerDto customer);
+        int TakeCustomerDetails(CustomerDto customer);
         int BookTableForCustomer(TablesDto table);
     }
 }
