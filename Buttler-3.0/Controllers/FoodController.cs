@@ -32,7 +32,11 @@ namespace Buttler_3._0.Controllers
         public async Task<IActionResult> AddCustomerDetails(CustomerDto customer)
         {
             var result = await Mediator.Send(new CustomerDetailCommand { Customer = customer });
-            return Ok(new ResultDto<object>(true, new { customerId = result }, "User added successfull"));
+            if (result != 0)
+            {
+                return Ok(new ResultDto<object>(true, new { customerId = result }, "User added successfull"));
+            }
+            return BadRequest(new ResultDto<bool>(false, false, "Phone number is invalid."));
         }
 
         /// <summary>

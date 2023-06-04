@@ -4,7 +4,7 @@
     {
         public enum Status
         {
-            pending, processing, ready
+            pending, processing, ready, paid
         }
     }
 }

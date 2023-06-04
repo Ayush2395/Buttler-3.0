@@ -1,6 +1,7 @@
 ﻿using Buttler.Application.DTO;
 using Buttler.Domain.Data;
 using Buttler.Infrastructure.Identity;
+using Buttler_3._0.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +15,13 @@ namespace Buttler_3._0.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly ButtlerContext _context;
+        private readonly IPDFservice _pdfService;
 
-        public OrdersController(UserManager<AppUser> userManager, ButtlerContext context)
+        public OrdersController(UserManager<AppUser> userManager, ButtlerContext context, IPDFservice pdfService)
         {
             _userManager = userManager;
             _context = context;
+            _pdfService = pdfService;
         }
 
         /// <summary>
@@ -70,6 +73,44 @@ namespace Buttler_3._0.Controllers
                 return Ok(new ResultDto<bool>(true, "Your order is successfully stored."));
             }
             return BadRequest(new ResultDto<bool>(false, "Something went wrong."));
+        }
+
+        [Authorize(Roles = "admin,staff")]
+        [HttpGet("GenerateBillReceipt/{customerId}")]
+        public async Task<IActionResult> GenerateReceipt([FromRoute] int customerId)
+        {
+            var foodIds = await (from ordItem in _context.OrderItems
+                                 join ordMst in _context.OrderMasters
+                                 on ordItem.OrderMasterId equals ordMst.OrderMasterId
+                                 join food in _context.Foods
+                                 on ordItem.FoodsId equals food.FoodsId
+                                 where ordMst.CustomerId == customerId
+                                 select new FoodId
+                                 {
+                                     FoodItemId = food.FoodsId
+                                 }
+                           ).ToListAsync();
+            var order = await (from ordItem in _context.OrderItems
+                               join ordMst in _context.OrderMasters on ordItem.OrderMasterId equals ordMst.OrderMasterId
+                               join customer in _context.Customers on ordMst.CustomerId equals customer.CustomerId
+                               where ordMst.CustomerId == customerId
+                               select new ReceiptDto
+                               {
+                                   CustomerName = customer.CustomerName,
+                                   CustomerPhoneNumber = customer.PhoneNumber,
+                                   FoodId = foodIds,
+                                   Bill = ordMst.TotalBill,
+                                   DateOfOrder = ordMst.DateOfOrder,
+                                   OrderId = ordMst.OrderMasterId,
+                                   Qty = ordItem.Quantity
+                               }).FirstOrDefaultAsync();
+
+            if (order != null)
+            {
+                var pdf = _pdfService.GenerateRecipte(order);
+                return Ok(new ResultDto<byte[]>(true, pdf));
+            }
+            return BadRequest();
         }
     }
 }

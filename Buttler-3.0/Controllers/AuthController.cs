@@ -131,8 +131,8 @@ namespace Buttler_3._0.Controllers
         /// <param name="currentPassword">Enter the current password for validation.</param>
         /// <returns></returns>
         [Authorize]
-        [HttpPost("ChangePassword")]
-        public async Task<IActionResult> ChangePassword(LoginDto model, string currentPassword)
+        [HttpPost("ChangePassword/{currentPassword}")]
+        public async Task<IActionResult> ChangePassword(LoginDto model, [FromRoute] string currentPassword)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
@@ -161,7 +161,7 @@ namespace Buttler_3._0.Controllers
                     return Ok(new ResultDto<bool>(true, "Your password is changed."));
                 }
             }
-            return BadRequest(new ResultDto<bool>(false, "Something went wrong."));
+            return BadRequest(new ResultDto<bool>(false, "You exceed the limit of change password, try next time."));
         }
 
         /// <summary>

@@ -1,6 +1,5 @@
 ﻿using Buttler.Application.DTO;
 using Buttler.Application.Repositories;
-using Buttler.Domain.Models;
 using MediatR;
 
 namespace Buttler.Application.Common.Commanda.Customer
@@ -17,9 +16,9 @@ namespace Buttler.Application.Common.Commanda.Customer
                 _bookTable = bookTable;
             }
 
-            public Task<int> Handle(CustomerDetailCommand request, CancellationToken cancellationToken)
+            public async Task<int> Handle(CustomerDetailCommand request, CancellationToken cancellationToken)
             {
-                return Task.FromResult(_bookTable.TakeCustomerDetails(request.Customer));
+                return await _bookTable.TakeCustomerDetails(request.Customer);
             }
         }
     }

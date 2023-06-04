@@ -10,4 +10,15 @@ namespace Buttler.Application.DTO
         public decimal? Bill { get; set; }
         public DateTime? DateOfOrder { get; set; }
     }
+
+    public class ReceiptDto
+    {
+        public int? OrderId { get; set; }
+        public string? CustomerName { get; set; }
+        public string? CustomerPhoneNumber { get; set; }
+        public decimal? Bill { get; set; }
+        public DateTime? DateOfOrder { get; set; }
+        public int? Qty { get; set; }
+        public List<FoodId>? FoodId { get; set; }
+    }
 }

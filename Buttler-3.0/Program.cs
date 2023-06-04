@@ -77,6 +77,7 @@ builder.Services.AddAuthentication(opt =>
 builder.Services.AddScoped<IFoodRepo, FoodRepo>();
 builder.Services.AddScoped<IBookTableRepo, BookTableRepo>();
 builder.Services.AddScoped<IBillingRepo, BillingRepo>();
+builder.Services.AddScoped<IPDFservice, PdfService>();
 
 builder.Services.AddCors(opt =>
 {

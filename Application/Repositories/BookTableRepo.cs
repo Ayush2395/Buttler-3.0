@@ -1,16 +1,18 @@
 ﻿using Buttler.Application.DTO;
 using Buttler.Domain.Data;
-using Buttler.Domain.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Buttler.Application.Repositories
 {
     public class BookTableRepo : IBookTableRepo
     {
         private readonly ButtlerContext _context;
+        private readonly ILogger<string> _logger;
 
-        public BookTableRepo(ButtlerContext context)
+        public BookTableRepo(ButtlerContext context, ILogger<string> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public int BookTableForCustomer(TablesDto table)
@@ -28,20 +30,28 @@ namespace Buttler.Application.Repositories
             return 0;
         }
 
-        public int TakeCustomerDetails(CustomerDto customer)
+        public async Task<int> TakeCustomerDetails(CustomerDto customer)
         {
-            if (customer != null)
+            try
             {
-                _context.Customers.Add(new()
+                if (customer != null && customer.PhoneNumber.Length == 10)
                 {
-                    CustomerName = customer.CustomerName,
-                    Gender = customer.CustomerGender,
-                    PhoneNumber = customer.PhoneNumber,
-                });
-                _context.SaveChanges();
-                var id = _context.Customers.OrderBy(r => r.CustomerId).LastOrDefault()!.CustomerId;
+                    _context.Customers.Add(new()
+                    {
+                        CustomerName = customer.CustomerName,
+                        Gender = customer.CustomerGender,
+                        PhoneNumber = customer.PhoneNumber,
+                    });
+                    await _context.SaveChangesAsync();
+                    var id = _context.Customers.OrderBy(r => r.CustomerId).LastOrDefault()!.CustomerId;
 
-                return id;
+                    return id;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occured while adding customer");
+                throw;
             }
             return 0;
         }
@@ -49,7 +59,7 @@ namespace Buttler.Application.Repositories
 
     public interface IBookTableRepo
     {
-        int TakeCustomerDetails(CustomerDto customer);
+        Task<int> TakeCustomerDetails(CustomerDto customer);
         int BookTableForCustomer(TablesDto table);
     }
 }
