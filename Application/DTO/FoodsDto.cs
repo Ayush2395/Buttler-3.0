@@ -13,5 +13,6 @@
     public class FoodId
     {
         public int FoodItemId { get; set; }
+        public int? Qty { get; set; }
     }
 }

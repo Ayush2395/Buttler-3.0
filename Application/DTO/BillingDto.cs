@@ -18,7 +18,6 @@ namespace Buttler.Application.DTO
         public string? CustomerPhoneNumber { get; set; }
         public decimal? Bill { get; set; }
         public DateTime? DateOfOrder { get; set; }
-        public int? Qty { get; set; }
         public List<FoodId>? FoodId { get; set; }
     }
 }

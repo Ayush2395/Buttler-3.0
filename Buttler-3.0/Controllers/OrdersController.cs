@@ -87,9 +87,11 @@ namespace Buttler_3._0.Controllers
                                  where ordMst.CustomerId == customerId
                                  select new FoodId
                                  {
-                                     FoodItemId = food.FoodsId
+                                     FoodItemId = food.FoodsId,
+                                     Qty = ordItem.Quantity
                                  }
                            ).ToListAsync();
+
             var order = await (from ordItem in _context.OrderItems
                                join ordMst in _context.OrderMasters on ordItem.OrderMasterId equals ordMst.OrderMasterId
                                join customer in _context.Customers on ordMst.CustomerId equals customer.CustomerId
@@ -102,7 +104,6 @@ namespace Buttler_3._0.Controllers
                                    Bill = ordMst.TotalBill,
                                    DateOfOrder = ordMst.DateOfOrder,
                                    OrderId = ordMst.OrderMasterId,
-                                   Qty = ordItem.Quantity
                                }).FirstOrDefaultAsync();
 
             if (order != null)

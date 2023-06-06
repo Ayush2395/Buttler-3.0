@@ -44,7 +44,7 @@ namespace Buttler_3._0.Services
                     sb.Append($"<th>#{item.FoodItemId}</th>\r\n");
 
                     sb.Append($"<th>{_context.Foods.FirstOrDefault(r => r.FoodsId == item.FoodItemId)?.Title}</th>\r\n");
-                    sb.Append($"<th>{receipt.Qty}</th>\r\n");
+                    sb.Append($"<th>{item.Qty}</th>\r\n");
                     sb.Append($"<th>${_context.Foods.FirstOrDefault(r => r.FoodsId == item.FoodItemId)?.Price}</th>\r\n");
                     sb.Append("</tr>\r\n");
                 }
