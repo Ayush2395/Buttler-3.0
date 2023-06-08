@@ -1,7 +1,6 @@
 ﻿using Buttler.Application.Common.Commanda.Customer;
 using Buttler.Application.Common.Query.Food;
 using Buttler.Application.DTO;
-using Buttler.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,7 +32,11 @@ namespace Buttler_3._0.Controllers
         public async Task<IActionResult> AddCustomerDetails(CustomerDto customer)
         {
             var result = await Mediator.Send(new CustomerDetailCommand { Customer = customer });
-            return result != null ? Ok(new ResultDto<Customers>(true, result, "Customer details added.")) : BadRequest(new ResultDto<bool>(false, "Please fill required fields."));
+            if (result != 0)
+            {
+                return Ok(new ResultDto<object>(true, new { customerId = result }, "User added successfull"));
+            }
+            return BadRequest(new ResultDto<bool>(false, false, "Phone number is invalid."));
         }
 
         /// <summary>
@@ -45,7 +48,7 @@ namespace Buttler_3._0.Controllers
         public async Task<IActionResult> BookTableForCustomer(TablesDto table)
         {
             var result = await Mediator.Send(new CustomerTableCommand { Table = table });
-            return result != null ? Ok(result) : BadRequest(new ResultDto<bool>(false, "Fill the table number."));
+            return result != 0 ? Ok(new { tableNumber = result }) : NotFound("Customer id is not found.");
         }
     }
 }

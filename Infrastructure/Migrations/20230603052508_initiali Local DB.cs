@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Buttler.Infrastructure.Migrations
 {
-    public partial class InitializeDb : Migration
+    public partial class initialiLocalDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -76,7 +76,7 @@ namespace Buttler.Infrastructure.Migrations
                     FoodsId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(85)", maxLength: 85, nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     FoodImg = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -218,7 +218,7 @@ namespace Buttler.Infrastructure.Migrations
                     DateOfOrder = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TablesId = table.Column<int>(type: "int", nullable: true),
                     CustomerId = table.Column<int>(type: "int", nullable: true),
-                    StaffId = table.Column<int>(type: "int", nullable: true),
+                    StaffId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
                     TotalBill = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     OrderStatus = table.Column<int>(type: "int", nullable: false)
                 },
@@ -229,12 +229,14 @@ namespace Buttler.Infrastructure.Migrations
                         name: "FK_OrderMasters_Customers_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customers",
-                        principalColumn: "CustomerId");
+                        principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_OrderMasters_Tables_TablesId",
                         column: x => x.TablesId,
                         principalTable: "Tables",
-                        principalColumn: "TablesId");
+                        principalColumn: "TablesId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -254,12 +256,14 @@ namespace Buttler.Infrastructure.Migrations
                         name: "FK_OrderItems_Foods_FoodsId",
                         column: x => x.FoodsId,
                         principalTable: "Foods",
-                        principalColumn: "FoodsId");
+                        principalColumn: "FoodsId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_OrderItems_OrderMasters_OrderMasterId",
                         column: x => x.OrderMasterId,
                         principalTable: "OrderMasters",
-                        principalColumn: "OrderMasterId");
+                        principalColumn: "OrderMasterId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

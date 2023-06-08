@@ -55,60 +55,6 @@ namespace Buttler_3._0.Controllers
         }
 
         /// <summary>
-        /// Register new user with credentials
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns>Give user credentials as the model given below.</returns>
-        [HttpPost("RegisterStaff")]
-        public async Task<IActionResult> RegisterNewUser([FromBody] RegisterDto model)
-        {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            var passwordValidator = _userManager.PasswordValidators;
-            List<string> errors = new();
-            foreach (var password in passwordValidator)
-            {
-                var result = await password.ValidateAsync(_userManager, null!, model.Password);
-                if (!result.Succeeded)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        errors.Add(error.Description);
-                    }
-                    return BadRequest(new ResultDto<List<string>>(false, errors));
-                }
-            }
-            if (user != null)
-            {
-                return BadRequest(new ResultDto<bool>(false, "User already exist."));
-            }
-            if (user == null)
-            {
-                var staffRole = await _roleManager.FindByNameAsync("staff");
-                var userDetails = new AppUser
-                {
-                    UserName = model.FirstName,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email,
-                    CreatedAt = DateTime.UtcNow,
-                    Gender = model.Gender,
-                    PhoneNumber = model.PhoneNumber,
-                };
-
-                var newUser = await _userManager.CreateAsync(userDetails, model.Password);
-                if (newUser.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(userDetails, staffRole.Name);
-                    return Ok(new ResultDto<bool>(true, "Your account is registered."));
-                }
-
-                return BadRequest(new ResultDto<IEnumerable<IdentityError>>(false, newUser.Errors));
-
-            }
-            return BadRequest();
-        }
-
-        /// <summary>
         /// Send the email verification code, but now returning only url string
         /// </summary>
         /// <param name="email">Enter user's email.</param>
@@ -185,8 +131,8 @@ namespace Buttler_3._0.Controllers
         /// <param name="currentPassword">Enter the current password for validation.</param>
         /// <returns></returns>
         [Authorize]
-        [HttpPost("ChangePassword")]
-        public async Task<IActionResult> ChangePassword(LoginDto model, string currentPassword)
+        [HttpPost("ChangePassword/{currentPassword}")]
+        public async Task<IActionResult> ChangePassword(LoginDto model, [FromRoute] string currentPassword)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
@@ -215,7 +161,7 @@ namespace Buttler_3._0.Controllers
                     return Ok(new ResultDto<bool>(true, "Your password is changed."));
                 }
             }
-            return BadRequest(new ResultDto<bool>(false, "Something went wrong."));
+            return BadRequest(new ResultDto<bool>(false, "You exceed the limit of change password, try next time."));
         }
 
         /// <summary>
@@ -259,6 +205,35 @@ namespace Buttler_3._0.Controllers
                 return BadRequest(new ResultDto<bool>(false, "Invalid token or token is expired."));
             }
             return BadRequest(new ResultDto<bool>(false, "Somthing went wrong."));
+        }
+
+        [Authorize(Roles = "admin,staff")]
+        [HttpGet("UserDetails")]
+        public async Task<IActionResult> GetUserDetails(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            var role = await _userManager.GetRolesAsync(user);
+            if (role == null) { return NotFound("User not found."); }
+            return Ok(new ResultDto<object>(true, new { user.UserName, user.FirstName, user.LastName, user.PhoneNumber, user.Email, user.EmailConfirmed, user.Age, user.Gender, user.ProfilePic, user.CreatedAt }, null!));
+        }
+
+        [HttpPost("UpdateProfile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UserDetailsDto user, string email)
+        {
+            var userData = await _userManager.FindByEmailAsync(email);
+            if (userData != null)
+            {
+                userData.FirstName = user.FirstName;
+                userData.LastName = user.LastName;
+                userData.PhoneNumber = user.PhoneNumber;
+                user.Age = user.Age;
+                userData.Email = user.Email;
+
+                await _userManager.UpdateAsync(userData);
+
+                return Ok(new ResultDto<bool>(true, true, "Profile is updated."));
+            }
+            return BadRequest(new ResultDto<bool>(false, false, "Profile is updated."));
         }
     }
 }

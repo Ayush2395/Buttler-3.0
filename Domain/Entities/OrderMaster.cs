@@ -1,5 +1,6 @@
 ﻿using Buttler.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Buttler.Domain.Entities
 {
@@ -12,7 +13,10 @@ namespace Buttler.Domain.Entities
         public Tables Tables { get; set; }
         public int? CustomerId { get; set; }
         public Customer Customer { get; set; }
-        public int? StaffId { get; set; }
+
+        [Column(TypeName = "nvarchar")]
+        [StringLength(450)]
+        public string? StaffId { get; set; }
         public decimal? TotalBill { get; set; }
         public OrderStatus.Status OrderStatus { get; set; } = Enums.OrderStatus.Status.pending;
     }

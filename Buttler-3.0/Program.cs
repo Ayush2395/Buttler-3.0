@@ -37,7 +37,7 @@ builder.Services.Configure<IdentityOptions>(opt =>
     opt.Password.RequiredUniqueChars = 1;
     opt.Password.RequireUppercase = true;
     opt.Password.RequireLowercase = true;
-    opt.Password.RequiredLength = 12;
+    opt.Password.RequiredLength = 8;
     opt.Password.RequireNonAlphanumeric = true;
     opt.Password.RequireDigit = true;
 
@@ -75,6 +75,7 @@ builder.Services.AddAuthentication(opt =>
 builder.Services.AddScoped<IFoodRepo, FoodRepo>();
 builder.Services.AddScoped<IBookTableRepo, BookTableRepo>();
 builder.Services.AddScoped<IBillingRepo, BillingRepo>();
+builder.Services.AddScoped<IPDFservice, PdfService>();
 
 builder.Services.AddCors(opt =>
 {

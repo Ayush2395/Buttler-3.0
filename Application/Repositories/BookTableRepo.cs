@@ -1,21 +1,23 @@
 ﻿using Buttler.Application.DTO;
 using Buttler.Domain.Data;
-using Buttler.Domain.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Buttler.Application.Repositories
 {
     public class BookTableRepo : IBookTableRepo
     {
         private readonly ButtlerContext _context;
+        private readonly ILogger<string> _logger;
 
-        public BookTableRepo(ButtlerContext context)
+        public BookTableRepo(ButtlerContext context, ILogger<string> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        public void BookTableForCustomer(TablesDto table)
+        public int BookTableForCustomer(TablesDto table)
         {
-            if (table != null)
+            if (table != null && _context.Customers.Any(r => r.CustomerId == table.CustomerId))
             {
                 _context.Tables.Add(new()
                 {
@@ -23,29 +25,41 @@ namespace Buttler.Application.Repositories
                     CustomerId = table.CustomerId,
                 });
                 _context.SaveChanges();
+                return _context.Tables.OrderBy(r => r.TablesId).LastOrDefault()!.TableNumber;
             }
+            return 0;
         }
 
-        public Customers TakeCustomerDetails(CustomerDto customer)
+        public async Task<int> TakeCustomerDetails(CustomerDto customer)
         {
-            if (customer != null)
+            try
             {
-                _context.Customers.Add(new()
+                if (customer != null && customer.PhoneNumber.Length == 10)
                 {
-                    CustomerName = customer.CustomerName,
-                    Gender = customer.CustomerGender,
-                    PhoneNumber = customer.PhoneNumber,
-                });
-                _context.SaveChanges();
+                    _context.Customers.Add(new()
+                    {
+                        CustomerName = customer.CustomerName,
+                        Gender = customer.CustomerGender,
+                        PhoneNumber = customer.PhoneNumber,
+                    });
+                    await _context.SaveChangesAsync();
+                    var id = _context.Customers.OrderBy(r => r.CustomerId).LastOrDefault()!.CustomerId;
+
+                    return id;
+                }
             }
-            var customers = _context.Customers.OrderBy(rec => rec.CustomerId).LastOrDefault();
-            return customers != null ? customers : null!;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occured while adding customer");
+                throw;
+            }
+            return 0;
         }
     }
 
     public interface IBookTableRepo
     {
-        Customers TakeCustomerDetails(CustomerDto customer);
-        void BookTableForCustomer(TablesDto table);
+        Task<int> TakeCustomerDetails(CustomerDto customer);
+        int BookTableForCustomer(TablesDto table);
     }
 }
