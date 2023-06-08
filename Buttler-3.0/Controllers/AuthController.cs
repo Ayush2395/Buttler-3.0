@@ -216,5 +216,24 @@ namespace Buttler_3._0.Controllers
             if (role == null) { return NotFound("User not found."); }
             return Ok(new ResultDto<object>(true, new { user.UserName, user.FirstName, user.LastName, user.PhoneNumber, user.Email, user.EmailConfirmed, user.Age, user.Gender, user.ProfilePic, user.CreatedAt }, null!));
         }
+
+        [HttpPost("UpdateProfile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UserDetailsDto user, string email)
+        {
+            var userData = await _userManager.FindByEmailAsync(email);
+            if (userData != null)
+            {
+                userData.FirstName = user.FirstName;
+                userData.LastName = user.LastName;
+                userData.PhoneNumber = user.PhoneNumber;
+                user.Age = user.Age;
+                userData.Email = user.Email;
+
+                await _userManager.UpdateAsync(userData);
+
+                return Ok(new ResultDto<bool>(true, true, "Profile is updated."));
+            }
+            return BadRequest(new ResultDto<bool>(false, false, "Profile is updated."));
+        }
     }
 }
